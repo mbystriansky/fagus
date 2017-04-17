@@ -1,5 +1,17 @@
-{"properties": [{
-  "name": "fagus.app.mqtt.topic",
-  "type": "java.lang.String",
-  "description": "Fagus application MQTT topic"
-}]}
+{"properties": [
+  {
+    "name": "fagus.app.mqtt.topic",
+    "type": "java.lang.String",
+    "description": "Fagus application MQTT topic"
+  },
+  {
+    "name": "fagus.app.moka7.server-url",
+    "type": "java.lang.String",
+    "description": "Fagus application Moka7 server url and parameters"
+  },
+  {
+    "name": "fagus.app.images.root-dir",
+    "type": "java.lang.String",
+    "description": "Root directory for images"
+  }
+]}

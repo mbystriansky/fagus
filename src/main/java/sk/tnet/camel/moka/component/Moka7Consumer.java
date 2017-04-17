@@ -1,5 +1,7 @@
 package sk.tnet.camel.moka.component;
 
+import java.nio.ByteBuffer;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.impl.ScheduledPollConsumer;
@@ -40,7 +42,7 @@ public class Moka7Consumer extends ScheduledPollConsumer {
 			delay = endpoint.getConfiguration().getDelay();
 		} else {
 			LOG.error(S7Client.ErrorText(result));
-			delay = 5000;
+			delay = endpoint.getConfiguration().getConnDelay();
 		}
 		LOG.info("Setting delay to {} ms", delay);
 		this.setDelay(delay);
@@ -51,13 +53,32 @@ public class Moka7Consumer extends ScheduledPollConsumer {
 		if (!s7Client.Connected) {
 			connect();
 			if (!s7Client.Connected) {
+			    s7Client.Disconnect();
 				return 0;
 			}
 		}
+		short data;
+        try {
+            data = dbReadShort(endpoint.getConfiguration().getDb(), endpoint.getConfiguration().getStart());
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            s7Client.Disconnect();
+            return 0;
+        }
 		Exchange exchange = endpoint.createExchange();
-		exchange.getIn().setBody(endpoint.getAddress(), String.class);
+        exchange.getIn().setBody(String.format("%02d", data), String.class);
 		getProcessor().process(exchange);
 		return 1;
 	}
+
+    public short dbReadShort(int db, int start) {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(2);
+        int result = s7Client.ReadArea(S7.S7AreaDB, db, start, 2, byteBuffer.array());
+        if (result == 0) {
+            return byteBuffer.getShort();
+        } else {
+            throw new RuntimeException("Chyba pri citani DataBloku " + db + ", kod chyby: " + result);
+        }
+    }      
 
 }
