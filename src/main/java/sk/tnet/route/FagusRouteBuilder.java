@@ -10,7 +10,7 @@ public class FagusRouteBuilder extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
-		from("moka7://{{fagus.app.moka7.server-url}}").to("log:" + Moka7Consumer.class).to("paho://{{fagus.app.mqtt.topic}}");
+		from("moka7://{{fagus.app.moka7.server-url}}").to("log:" + Moka7Consumer.class.getCanonicalName() + "?level=DEBUG").to("paho://{{fagus.app.mqtt.topic}}");
 	}
 
 }
